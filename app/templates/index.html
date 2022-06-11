@@ -1,36 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Lista de personal</h1>
+<h1>Vista Principal</h1>
 
-  <br>
-  <a href="{{ url_for('ingresar_personal') }}"><button type="button" class="btn btn-primary">Ingresar personal</button></a>
-  <br><br>
-  <!-- crear tabla con lista de personal -->
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Nombre</th>
-        <th scope="col">Apellido</th>
-        <th scope="col">Telefono</th>
-        <th scope="col"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for p in personal %}
-      <tr>
-        <th scope="row">{{ p.id }}</th>
-        <td>{{ p.nombre }}</td>
-        <td>{{ p.apellido }}</td>
-        <td>{{ p.telefono }}</td>
-        <td>
-          <a href="{{ url_for('index', borrar=p.id) }}"><span class="badge bg-danger">Eliminar</span></a>
-          <a href="{{ url_for('editar_personal', id_empleado=p.id) }}"><span class="badge bg-secondary">Editar</span></a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<br>
+<!-- tarjeta para tabla de ingresos -->
+<div class="card shadow">
+  <div class="card-header d-flex">
+    <!-- contiene titulo en h3 y un boton para agregar un ingreso -->
+    <h3 class="me-4">Ingresos</h3>
+    <a href="{{ url_for('ingresar_ingreso') }}"><button type="button" class="btn btn-primary">Nuevo
+        ingreso</button></a>
+  </div>
+  <div class="card-body">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Fecha</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Apellido</th>
+          <th scope="col">DNI</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in ingresos %}
+        <tr>
+          <th scope="row">{{ i.id }}</th>
+          <td>{{ i.fecha }}</td>
+          <td>{{ i.nombre }}</td>
+          <td>{{ i.apellido }}</td>
+          <td>{{ i.dni }}</td>
+          <td>
+            <a href="{{ url_for('index', borraringreso=i.id) }}"><span class="badge bg-danger">Eliminar</span></a>
+            <a href="{{ url_for('editar_ingreso', id_ingreso=i.id) }}"><span
+                class="badge bg-secondary">Editar</span></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<br><br>
+
+<a href="{{ url_for('ingresar_personal') }}"><button type="button" class="btn btn-primary">Ingresar
+    personal</button></a>
+<br><br>
+<!-- crear tabla con lista de personal -->
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Apellido</th>
+      <th scope="col">Telefono</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in personal %}
+    <tr>
+      <th scope="row">{{ p.id }}</th>
+      <td>{{ p.nombre }}</td>
+      <td>{{ p.apellido }}</td>
+      <td>{{ p.telefono }}</td>
+      <td>
+        <a href="{{ url_for('index', borrarpersonal=p.id) }}"><span class="badge bg-danger">Eliminar</span></a>
+        <a href="{{ url_for('editar_personal', id_empleado=p.id) }}"><span class="badge bg-secondary">Editar</span></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br><br>
 {% endblock %}
-

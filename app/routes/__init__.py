@@ -1,18 +1,21 @@
 from flask import render_template, redirect, url_for, session, flash, request
 from app.auth import login_required
 from app import app
-from app.forms import LoginForm, IngresarPersonalForm
-from app.handlers import eliminar_personal, get_personal_por_id, validar_usuario, get_personal, agregar_personal
+from app.forms import LoginForm, IngresarPersonalForm, IngresarIngresoForm
+from app.handlers import eliminar_personal, get_personal_por_id, validar_usuario, get_personal, agregar_personal, get_ingresos, eliminar_ingreso, agregar_ingreso, get_ingreso_por_id
 
 
 @app.route('/')  # http://localhost:5000/
 @app.route('/index')
 @login_required
 def index():
-    if request.method == 'GET' and request.args.get('borrar'):
-        eliminar_personal(request.args.get('borrar'))
+    if request.method == 'GET' and request.args.get('borrarpersonal'):
+        eliminar_personal(request.args.get('borrar_personal'))
         flash('Se ha eliminado el empleado', 'success')
-    return render_template('index.html', titulo="Inicio", personal=get_personal())
+    if request.method == 'GET' and request.args.get('borraringreso'):
+        eliminar_ingreso(request.args.get('borraringreso'))
+        flash('Se ha eliminado el ingreso', 'success')
+    return render_template('index.html', titulo="Inicio", personal=get_personal(), ingresos=get_ingresos())
 
 
 @app.route('/ingresar-personal', methods=['GET', 'POST'])
@@ -44,6 +47,37 @@ def editar_personal(id_empleado):
         flash('Se ha editado el empleado exitosamente', 'success')
         return redirect(url_for('index'))
     return render_template('editar_personal.html', titulo="Personal", personal_form=personal_form)
+
+
+@app.route('/editar-ingreso/<int:id_ingreso>', methods=['GET', 'POST'])
+@login_required
+def editar_ingreso(id_ingreso):
+    ingreso_form = IngresarIngresoForm(data=get_ingreso_por_id(id_ingreso))
+    if ingreso_form.cancelar.data:  # si se apretó el boton cancelar, ingreso_form.cancelar.data será True
+        return redirect(url_for('index'))
+    if ingreso_form.validate_on_submit():
+        datos_nuevos = { 'nombre': ingreso_form.nombre.data, 'apellido': ingreso_form.apellido.data, 
+                         'dni': ingreso_form.dni.data, 'fecha': ingreso_form.fecha.data }
+        eliminar_ingreso(id_ingreso)  # Eliminamos el ingreso antiguo
+        agregar_ingreso(datos_nuevos)  # Agregamos el nuevo ingreso
+        flash('Se ha editado el ingreso exitosamente', 'success')
+        return redirect(url_for('index'))
+    return render_template('editar_ingreso.html', titulo="Ingreso", ingreso_form=ingreso_form)
+
+
+@app.route('/ingresar-ingreso', methods=['GET', 'POST'])
+@login_required
+def ingresar_ingreso():
+    ingreso_form = IngresarIngresoForm()
+    if ingreso_form.cancelar.data:  # si se apretó el boton cancelar, ingreso_form.cancelar.data será True
+        return redirect(url_for('index'))
+    if ingreso_form.validate_on_submit():
+        datos_nuevos = { 'nombre': ingreso_form.nombre.data, 'apellido': ingreso_form.apellido.data, 
+                         'dni': ingreso_form.dni.data, 'fecha': ingreso_form.fecha.data }
+        agregar_ingreso(datos_nuevos)
+        flash('Se ha agregado un nuevo ingreso', 'success')
+        return redirect(url_for('index'))
+    return render_template('ingresar_ingreso.html', titulo="Ingreso", ingreso_form=ingreso_form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
